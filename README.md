@@ -3,7 +3,7 @@ This project determines ranges which are appropriate for laying epoxy.
 
 
 ## Questions
-* Where should I store the data? SQLite? Postgres?
+* Where should I store the data? MongoDB Atlas/Postgres
 * Is there a preferred order to creating the different pieces of the project?
 
 
