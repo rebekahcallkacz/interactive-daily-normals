@@ -1,20 +1,7 @@
 # interactive-daily-normals
 This project determines ranges which are appropriate for laying epoxy.
 
-
-## Questions
-* Where should I store the data? MongoDB Atlas/Postgres
-* Is there a preferred order to creating the different pieces of the project?
-
-
-
-
 ## Tasks
-* Upload data to MongoDB
-    BEFORE: reformat data - put into JSON w/ keys that are easy to use 
-    1. Table 1: Zip code in SE w/ nearest weather station
-    2. Table 2: Weather station metadata (zipcodes, station IDs, counties, etc.)
-    3. Table 3: Weather data (daily normals for entire year for each station)
 * Create Flask API
     1. Filter by zipcode 
     2. Filter by date
@@ -33,13 +20,11 @@ This project determines ranges which are appropriate for laying epoxy.
 
 
 ## TODO
-* Set up MongoDB
-* Heroku deployment
-    * keleton HTML/JS
-    * Heroku docs
-    * Virtual environment
-    * Basic Flask API w/ access to data
+
 * Build out Flask API
+    Dynamic search: date/zipcode (zip required, dates not)
+    Zipcode pulls closest weather station from zipcodes collection and uses that to filter normals collection
+    Optional additional filter is dates for normals
 * Create plot(s): https://plotly.com/javascript/filled-area-plots/ 
 * Work on HTML
 * Create API

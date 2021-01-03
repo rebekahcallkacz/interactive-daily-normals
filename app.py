@@ -77,14 +77,22 @@ def getZipcodes():
 
 @app.route('/api/zipcode')
 def getZipcode():
-    desired_zip = '34233'
+    desired_zip = '26031'
     zip_data = mongo.db.zipcodes.find({'ZIP':desired_zip})
     zip_list = []
     for zipcode in zip_data:
         del zipcode['_id']
         zip_list.append(zipcode)
     if len(zip_list) > 0:
-        return jsonify(zip_list)
+        weather_station = zip_list[0]['CLOSEST-STATION']
+        normals_data = mongo.db.normals.find({'NAME': weather_station})
+        normals_list = []
+        for normals in normals_data:
+            del normals['_id']
+            normals_list.append(normals)
+
+        return jsonify(normals_list)
+
     else:
         return 'none'
 
