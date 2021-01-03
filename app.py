@@ -17,7 +17,7 @@ password = os.getenv("db_password")
 app = Flask(__name__)
 
 # Connection to MongoDB database
-normals_database = f'mongodb+srv://{username}:{password}@clusterprime.mpaq0.mongodb.net/ETL?retryWrites=true&w=majority'
+normals_database = f'mongodb+srv://{username}:{password}@cluster0.lnnzp.mongodb.net/weather?retryWrites=true&w=majority'
 
 # Configure MongoDB
 app.config['MONGO_URI'] = os.environ.get('MONGODB_URI', normals_database)
@@ -26,8 +26,8 @@ app.config['MONGO_URI'] = os.environ.get('MONGODB_URI', normals_database)
 mongo = PyMongo(app)
 
 # Format of db in MONGODB:
-# Database: normals
-# Collection: weather
+# Database: weather
+# Collection: normals
 # Keys: ['STATION', 'NAME', 'LATITUDE', 'LONGITUDE', 'ELEVATION', 'DATE', 'DLY-TAVG-NORMAL', 'DLY-TAVG-STDDEV', 'DLY-TMAX-NORMAL', 
 # 'DLY-TMAX-STDDEV', 'DLY-TMIN-NORMAL', 'DLY-TMIN-STDDEV', 'STATE', 'COUNTY', 'ZIP']
 # Collection: stations
@@ -45,11 +45,35 @@ def navbar():
 
 # Will need to add templates for rendering additional webpages 
 
-# @app.route('/api/stations')
-# def getStations():
-#     station_data = mongo.db.stations.find({})
+@app.route('/api/normals')
+def getNormals():
+    normals_data = mongo.db.normals.find({})
+    normals_list = []
+    for normals in normals_data:
+        del normals['_id']
+        normals_list.append(normals)
 
-#     return station_data
+    return jsonify(normals_list)
+
+@app.route('/api/stations')
+def getStations():
+    station_data = mongo.db.stations.find({})
+    station_list = []
+    for station in station_data:
+        del station['_id']
+        station_list.append(station)
+
+    return jsonify(station_list)
+
+@app.route('/api/zipcodes')
+def getZipcodes():
+    zip_data = mongo.db.zipcodes.find({})
+    zip_list = []
+    for zipcode in zip_data:
+        del zipcode['_id']
+        zip_list.append(zipcode)
+
+    return jsonify(zip_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
