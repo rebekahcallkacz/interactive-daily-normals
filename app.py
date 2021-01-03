@@ -40,7 +40,7 @@ def home():
     return render_template('index.html')
 
 @app.route('/nav')
-def home():
+def navbar():
     return render_template('nav.html')
 
 # Will need to add templates for rendering additional webpages 
