@@ -45,7 +45,7 @@ def navbar():
 
 # Will need to add templates for rendering additional webpages 
 
-@app.route('/api/normals')
+@app.route('/api/allnormals')
 def getNormals():
     normals_data = mongo.db.normals.find({})
     normals_list = []
@@ -55,7 +55,7 @@ def getNormals():
 
     return jsonify(normals_list)
 
-@app.route('/api/stations')
+@app.route('/api/allstations')
 def getStations():
     station_data = mongo.db.stations.find({})
     station_list = []
@@ -65,7 +65,7 @@ def getStations():
 
     return jsonify(station_list)
 
-@app.route('/api/zipcodes')
+@app.route('/api/allzipcodes')
 def getZipcodes():
     zip_data = mongo.db.zipcodes.find({})
     zip_list = []
@@ -74,6 +74,19 @@ def getZipcodes():
         zip_list.append(zipcode)
 
     return jsonify(zip_list)
+
+@app.route('/api/zipcode')
+def getZipcode():
+    desired_zip = '34233'
+    zip_data = mongo.db.zipcodes.find({'ZIP':desired_zip})
+    zip_list = []
+    for zipcode in zip_data:
+        del zipcode['_id']
+        zip_list.append(zipcode)
+    if len(zip_list) > 0:
+        return jsonify(zip_list)
+    else:
+        return 'none'
 
 if __name__ == '__main__':
     app.run(debug=True)
