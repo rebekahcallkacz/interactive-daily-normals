@@ -9,8 +9,9 @@ This project determines ranges which are appropriate for laying epoxy.
 
 
 
-## TODO
-* Create ERD - upload data to database
+## Tasks
+* Upload data to MongoDB
+    BEFORE: reformat data - put into JSON w/ keys that are easy to use 
     1. Table 1: Zip code in SE w/ nearest weather station
     2. Table 2: Weather station metadata (zipcodes, station IDs, counties, etc.)
     3. Table 3: Weather data (daily normals for entire year for each station)
@@ -29,3 +30,17 @@ This project determines ranges which are appropriate for laying epoxy.
     4. Landing page
     5. Data page (data sources)
 * Heroku deployment
+
+
+## TODO
+* Set up MongoDB
+* Heroku deployment
+    * keleton HTML/JS
+    * Heroku docs
+    * Virtual environment
+    * Basic Flask API w/ access to data
+* Build out Flask API
+* Create plot(s): https://plotly.com/javascript/filled-area-plots/ 
+* Work on HTML
+* Create API
+* Write website text/info
