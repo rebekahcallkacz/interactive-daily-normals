@@ -39,13 +39,17 @@ mongo = PyMongo(app)
 def home():
     return render_template('index.html')
 
+@app.route('/nav')
+def home():
+    return render_template('nav.html')
+
 # Will need to add templates for rendering additional webpages 
 
-@app.route('/api/teststations')
-def getStations():
-    station_data = mongo.db.stations.find({})
+# @app.route('/api/stations')
+# def getStations():
+#     station_data = mongo.db.stations.find({})
 
-    return station_data
+#     return station_data
 
 if __name__ == '__main__':
     app.run(debug=True)
