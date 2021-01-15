@@ -4,6 +4,7 @@ This project determines date ranges which are appropriate for laying epoxy.
 ## Tasks
 * Make dataset leaner (remove any unnecessary/unused columns)
 * Add date that includes a year to dataset (2008)
+    Should insert dates using datetime: https://pymongo.readthedocs.io/en/stable/examples/datetimes.html 
 * Create Flask API
     3. Filter by date and zipcode
 * Create plots/visuals with filtered data
