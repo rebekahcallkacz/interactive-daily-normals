@@ -95,6 +95,7 @@ def searchZipcode(zipcode):
     else:
         return 'none'
 
+# TODO: filter this route by date
 @app.route('/api/<zipcode>/<start>/<end>')
 def searchZipDate(zipcode, start, end):
     zip_data = mongo.db.zipcodes.find({'ZIP':zipcode})
