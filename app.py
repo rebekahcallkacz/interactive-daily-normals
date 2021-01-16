@@ -3,6 +3,7 @@ from flask import Flask, render_template, jsonify
 from flask_pymongo import PyMongo
 import os
 from dotenv import load_dotenv
+import datetime as dt
 
 # Pull passwords from your .env file for when you are working locally
 # TODO: Create a .env file at the same level as this file - include these two lines:
@@ -34,6 +35,9 @@ mongo = PyMongo(app)
 # Keys: ['STATION', 'NAME', 'LATITUDE', 'LONGITUDE', 'STATE', 'COORD', 'COUNTY', 'ZIP']
 # Collection: zipcodes
 # Keys: ['ZIP', 'STATE', 'LATITUDE', 'LONGITUDE', 'CLOSEST-STATION']
+# Collection: normals_test
+# Keys: same as normals except added filed DATE_FILTER which contains dates in MONGODB format w/ year 2008
+# NOTE: dataset only contains zipcodes 27253 (1 weather station) and 27215 (2 weather stations)
 
 @app.route('/')
 def home():
@@ -47,7 +51,7 @@ def navbar():
 
 @app.route('/api/allnormals')
 def getNormals():
-    normals_data = mongo.db.normals.find({})
+    normals_data = mongo.db.normals_test.find({})
     normals_list = []
     for normals in normals_data:
         del normals['_id']
@@ -84,7 +88,7 @@ def searchZipcode(zipcode):
         zip_list.append(doc)
     if len(zip_list) > 0:
         weather_station = zip_list[0]['CLOSEST-STATION']
-        normals_data = mongo.db.normals.find({'NAME': weather_station})
+        normals_data = mongo.db.normals_test.find({'NAME': weather_station})
         normals_list = []
         for normals in normals_data:
             del normals['_id']
@@ -105,7 +109,7 @@ def searchZipDate(zipcode, start, end):
         zip_list.append(doc)
     if len(zip_list) > 0:
         weather_station = zip_list[0]['CLOSEST-STATION']
-        normals_data = mongo.db.normals.find({'NAME': weather_station})
+        normals_data = mongo.db.normals_test.find({'NAME': weather_station})
         normals_list = []
         for normals in normals_data:
             del normals['_id']
@@ -113,6 +117,23 @@ def searchZipDate(zipcode, start, end):
 
         return jsonify(normals_list)
 
+    else:
+        return 'none'
+
+# Test route for date filtering
+@app.route('/api/<start>/<end>')
+def searchDate(start, end):
+    start = dt.datetime.strptime(start, '%Y-%m-%d')
+    end = dt.datetime.strptime(end, '%Y-%m-%d')
+    zipcode = "27253"
+    # Returns all but end date - need to figure out how to return end date
+    normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 'DATE_FILTER': {'$gte': start, "$lte": end}})
+    normals_list = []
+    for normals in normals_data:
+        del normals['_id']
+        normals_list.append(normals)
+    if len(normals_list) > 0:
+        return jsonify(normals_list)
     else:
         return 'none'
         
