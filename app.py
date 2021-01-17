@@ -19,9 +19,10 @@ app = Flask(__name__)
 
 # Connection to MongoDB database
 normals_database = f'mongodb+srv://{username}:{password}@cluster0.lnnzp.mongodb.net/weather?retryWrites=true&w=majority'
+local_database = 'mongodb://localhost:27017/weather'
 
 # Configure MongoDB
-app.config['MONGO_URI'] = os.environ.get('MONGODB_URI', normals_database)
+app.config['MONGO_URI'] = os.environ.get('MONGODB_URI', local_database)
 
 # Initialize MongoDB application
 mongo = PyMongo(app)
@@ -103,33 +104,12 @@ def searchZipcode(zipcode):
     else:
         return 'none'
 
-# TODO: filter this route by date
+# Test route for date and zipcode filtering
 @app.route('/api/<zipcode>/<start>/<end>')
-def searchZipDate(zipcode, start, end):
-    zip_data = mongo.db.zipcodes.find({'ZIP':zipcode})
-    zip_list = []
-    for doc in zip_data:
-        del doc['_id']
-        zip_list.append(doc)
-    if len(zip_list) > 0:
-        weather_station = zip_list[0]['CLOSEST-STATION']
-        normals_data = mongo.db.normals_test.find({'NAME': weather_station})
-        normals_list = []
-        for normals in normals_data:
-            del normals['_id']
-            normals_list.append(normals)
-
-        return jsonify(normals_list)
-
-    else:
-        return 'none'
-
-# Test route for date filtering
-@app.route('/api/<start>/<end>')
-def searchDate(start, end):
+def searchDate(zipcode, start, end):
+    zipcode = zipcode
     start = dt.datetime.strptime(start, '%Y-%m-%d')
-    end = dt.datetime.strptime(end, '%Y-%m-%d')
-    zipcode = "27253"
+    end = dt.datetime.strptime(end, '%Y-%m-%d') + dt.timedelta(days=1)
     # Returns all but end date - need to figure out how to return end date
     normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 'DATE_FILTER': {'$gte': start, "$lte": end}})
     normals_list = []
