@@ -1,3 +1,5 @@
+// References: http://www.daterangepicker.com/ 
+
 // Select the zipcode search button
 var zip_search = d3.select('#zip-search');
 
@@ -5,7 +7,7 @@ var zip_search = d3.select('#zip-search');
 var date_picker = d3.select('#add-dates');
 
 // Create event listeners for buttons
-zip_search.on('click', printZip);
+zip_search.on('click', zipAPI);
 
 date_picker.on('click', showDatePicker);
 
@@ -21,27 +23,23 @@ $(function() {
         "showDropdowns": true,
       opens: 'left'
     }, function(start, end, label) {
-        // Select search button
-        var search = d3.select('#add-dates');
-
-        // Create event listener for button
-        search.on('click', generatePlot(start, end));
+        var zipcode = d3.select('#zipcode').property('value');
+        let api_call = '/api/' + zipcode + '/' + start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD')
+        console.log(api_call)
+        generatePlot(api_call);
     });
   });
 
 // This function prints the zipcode input
-  function printZip(){
+  function zipAPI(){
     // Select the zipcode input
     var zipcode = d3.select('#zipcode').property('value');
-    console.log(zipcode)
+    let api_call = '/api/' + zipcode
+    console.log(api_call)
+    generatePlot(api_call)
 }
 
 // This function generates the plot
-function generatePlot(start, end) {
-    // Select zipcode entry
-    var zipcode = d3.select('#zipcode').property('value');
-    console.log(zipcode)
-    console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-    console.log(start)
-    console.log(end)
+function generatePlot(api_call) {
+    console.log('get data and plot here')
 }

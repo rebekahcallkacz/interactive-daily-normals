@@ -47,6 +47,10 @@ def home():
 def navbar():
     return render_template('nav.html')
 
+@app.route('/methods')
+def methods():
+    return render_template('methods.html')
+
 # Will need to add templates for rendering additional webpages 
 
 @app.route('/api/allnormals')
