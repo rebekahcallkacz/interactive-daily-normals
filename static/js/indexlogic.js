@@ -25,7 +25,6 @@ $(function() {
     }, function(start, end, label) {
         var zipcode = d3.select('#zipcode').property('value');
         let api_call = '/api/' + zipcode + '/' + start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD')
-        console.log(api_call)
         generatePlot(api_call);
     });
   });
@@ -34,12 +33,51 @@ $(function() {
   function zipAPI(){
     // Select the zipcode input
     var zipcode = d3.select('#zipcode').property('value');
-    let api_call = '/api/' + zipcode
-    console.log(api_call)
-    generatePlot(api_call)
+    let api_call = '/api/' + zipcode;
+    generatePlot(api_call);
 }
 
 // This function generates the plot
 function generatePlot(api_call) {
-    console.log('get data and plot here')
+    d3.json(api_call).then((data) => {
+      console.log(data);
+
+      // Set up marker for temps in range
+      var temp_min = {
+        // Set these to max/min of dataset x
+        x: [0, 100],
+        y: [40, 100]
+      };
+
+      var temp_buffer = {
+        x: [0, 100],
+        y: [20, 20],
+      };
+
+      // Set up layout
+      var layout = {
+        title: 'Daily Normals for Selected Date Range',
+        shapes: [
+          {
+            type: 'rect',
+            //xref: 'paper',
+            //yref: 'y',
+            x0: 0,
+            y0: 50,
+            // Set to max of dataset
+            x1: 100,
+            y2: 100,
+            fillcolor: '#d3d3d3',
+            opacity: '0.3',
+            line: {
+              width:0
+            } 
+          }
+        ]
+      }
+
+      var data = [temp_min, temp_buffer]
+
+      Plotly.newPlot('normals-plot', data, layout)
+    })
 }

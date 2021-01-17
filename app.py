@@ -1,9 +1,12 @@
+# TODO: Connect to full normals collection instead of test collection
+
 # Dependencies
 from flask import Flask, render_template, jsonify
 from flask_pymongo import PyMongo
 import os
 from dotenv import load_dotenv
 import datetime as dt
+import re
 
 # Pull passwords from your .env file for when you are working locally
 # TODO: Create a .env file at the same level as this file - include these two lines:
@@ -13,6 +16,12 @@ import datetime as dt
 load_dotenv()
 username = os.getenv("db_username")
 password = os.getenv("db_password")
+
+# This function replaces the year in a date with the year 2008
+def formatYear(date_string):
+    regex = re.compile('[0-9][0-9][0-9][0-9](-[0-9][0-9]-[0-9][0-9])')
+    date = '2008' + regex.findall(date_string)[0]
+    return date
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -105,13 +114,17 @@ def searchZipcode(zipcode):
         return 'none'
 
 # Test route for date and zipcode filtering
+# TODO: add zipcode layer from api/zipcode to this route
 @app.route('/api/<zipcode>/<start>/<end>')
 def searchDate(zipcode, start, end):
     zipcode = zipcode
-    start = dt.datetime.strptime(start, '%Y-%m-%d')
-    end = dt.datetime.strptime(end, '%Y-%m-%d') + dt.timedelta(days=1)
-    # Returns all but end date - need to figure out how to return end date
-    normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 'DATE_FILTER': {'$gte': start, "$lte": end}})
+    start_2008 = formatYear(start)
+    end_2008 = formatYear(end)
+    start_filter = dt.datetime.strptime(start_2008, '%Y-%m-%d')
+    end_filter = dt.datetime.strptime(end_2008, '%Y-%m-%d') + dt.timedelta(days=1)
+
+    # Return only date range for given zipcode
+    normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 'DATE_FILTER': {'$gte': start_filter, "$lte": end_filter}})
     normals_list = []
     for normals in normals_data:
         del normals['_id']
