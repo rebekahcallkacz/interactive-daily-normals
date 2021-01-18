@@ -61,6 +61,14 @@ def navbar():
 def methods():
     return render_template('methods.html')
 
+@app.route('/data')
+def data():
+    return render_template('data.html')
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
 # Will need to add templates for rendering additional webpages 
 
 @app.route('/api/allnormals')
