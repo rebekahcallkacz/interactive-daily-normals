@@ -3,9 +3,6 @@ This project determines date ranges which are appropriate for laying epoxy.
 
 ## TODO
 * Upload data to local mongodb database 
-* Create JS/plot(s): https://plotly.com/javascript/filled-area-plots/ 
-    1. Table w/ temps for given date range
-    2. Metadata about weather station
 * Finalize API (one vs. two normals routes?)
 * Build out w/ full dataset (add faux dates, make dataset leaner)
 * Work on HTML

@@ -104,6 +104,9 @@ function addStationData(data){
   // Clear previous text
   d3.selectAll('#station-data').text('');
 
+  // Reveal card
+  d3.select('#station-info-card').classed('d-none', false)
+
   d3.select('#station-name').text(data['NAME']);
   d3.select('#station-county').text(data['COUNTY']);
   d3.select('#station-zipcode').text(data['ZIP']);
