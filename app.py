@@ -114,7 +114,7 @@ def searchZipcode(zipcode):
         return 'none'
 
 # Test route for date and zipcode filtering
-# TODO: add zipcode layer from api/zipcode to this route
+# TODO: add zipcode search layer to this route - find nearest weather station and then go from there
 @app.route('/api/<zipcode>/<start>/<end>')
 def searchDate(zipcode, start, end):
     zipcode = zipcode

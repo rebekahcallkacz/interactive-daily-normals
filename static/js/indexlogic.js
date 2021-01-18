@@ -1,4 +1,13 @@
 // References: http://www.daterangepicker.com/ 
+// https://stackoverflow.com/questions/6291225/convert-date-from-thu-jun-09-2011-000000-gmt0530-india-standard-time-to
+
+// This function parses the dates to only return year/month/day
+function formatXticks(str) {
+  var date = new Date(str),
+    mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+    day = ("0" + date.getDate()).slice(-2);
+  return [date.getFullYear(), mnth, day].join("-");
+}; 
 
 // Select the zipcode search button
 var zip_search = d3.select('#zip-search');
@@ -40,33 +49,65 @@ $(function() {
 // This function generates the plot
 function generatePlot(api_call) {
     d3.json(api_call).then((data) => {
-      console.log(data);
 
       // Set up marker for temps in range
-      var temp_min = {
-        // Set these to max/min of dataset x
-        x: [0, 100],
-        y: [40, 100]
+      var min = {
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+          color: '#cda2e7'
+        },
+        x: data.map(date => formatXticks(date['DATE_FILTER'])),
+        y: data.map(date => date['DLY-TMIN-NORMAL']),
+        name: 'Minimum (F)'
       };
 
-      var temp_buffer = {
-        x: [0, 100],
-        y: [20, 20],
+      var avg = {
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+          color: '#cda2e7'
+        },
+        x: data.map(date => formatXticks(date['DATE_FILTER'])),
+        y: data.map(date => date['DLY-TAVG-NORMAL']),
+        name: 'Average (F)'
       };
+
+      var max = {
+        type: 'scatter',
+        mode: 'lines',
+        line: {
+          color: '#cda2e7'
+        },
+        x: data.map(date => formatXticks(date['DATE_FILTER'])),
+        y: data.map(date => date['DLY-TMAX-NORMAL']),
+        name: 'Maximum (F)'
+      }; 
 
       // Set up layout
       var layout = {
         title: 'Daily Normals for Selected Date Range',
+        xaxis: {
+          tickformat: '%b-%e',
+          tickangle: 45,
+        },
+        yaxis: {
+          range: [0, 120]
+        },
+        legend: {
+          x: 1,
+          y: 0.75
+        },
         shapes: [
           {
             type: 'rect',
-            //xref: 'paper',
-            //yref: 'y',
+            yref: 'y',
+            xref: 'paper',
             x0: 0,
             y0: 50,
             // Set to max of dataset
-            x1: 100,
-            y2: 100,
+            x1: 50,
+            y1: 100,
             fillcolor: '#d3d3d3',
             opacity: '0.3',
             line: {
@@ -76,7 +117,7 @@ function generatePlot(api_call) {
         ]
       }
 
-      var data = [temp_min, temp_buffer]
+      var data = [min, avg, max]
 
       Plotly.newPlot('normals-plot', data, layout)
     })
