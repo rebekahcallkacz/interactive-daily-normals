@@ -14,6 +14,9 @@
     integrity="sha384-9+PGKSqjRdkeAU7Eu4nkJU8RFaH8ace8HGXnkiKMP9I9Te0GJ4/km3L1Z8tXigpG" crossorigin="anonymous">
   <!-- Date Picker Style Sheet -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+  <!-- DataTables Style Sheet -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-flash-1.6.5/b-html5-1.6.5/datatables.min.css"/>
+
 </head>
 
 <!--Navigation bar-->
@@ -25,7 +28,7 @@
 
     <!--Header-->
     <div class='row'>
-      <div class='col-md-12'>
+      <div class='col-md-12 text-center'>
         <h2 class='m-4'>Daily Normals for the Southeast United States</h2>
       </div>
     </div>
@@ -52,6 +55,8 @@
             </div>
           </div>
         </div>
+        <br>
+        <br>
       </div>
       <div class='col-md-8'>
         <div id='normals-plot'></div>
@@ -60,8 +65,32 @@
 
     <!-- Weather Station Info and Temp Table -->
     <div class='row'>
-      <div class='col-md-4'></div>
-      <div class='col-md-8'></div>
+      <div class='col-md-4'>
+        <div class='card'>
+          <div class='card-body'>
+            <h5>Data Source</h5>
+            <hr>
+            <h6>Weather Station:</h6>
+            <p class='station-data' id='station-name'></p>
+            <h6>County:</h6>
+            <p class='station-data' id='station-county'></p>
+            <h6>Zipcode:</h6>
+            <p class='station-data' id='station-zipcode'></p>
+          </div>
+        </div>
+      </div>
+      <div class='col-md-8'>
+        <table id='data' class='table table-striped d-none'>
+          <thead class='p-2 thead-dark'>
+            <tr>
+              <th>Date</th>
+              <th>Min (F)</th>
+              <th>Avg (F)</th>
+              <th>Max (F)</th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     </div>
 
   </div>
@@ -83,6 +112,9 @@
 
   <!-- Plotly -->
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <!-- DataTables-->
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.23/b-1.6.5/b-flash-1.6.5/b-html5-1.6.5/datatables.min.js"></script>
 
   <!-- Custom JS -->
   <script type="text/javascript" charset="utf8" src="../static/js/indexlogic.js"></script>

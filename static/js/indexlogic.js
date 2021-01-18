@@ -99,6 +99,50 @@ function generatePlot(data){
         Plotly.newPlot('normals-plot', data, layout);
 };
 
+// This function adds station metadata to the page
+function addStationData(data){
+  // Clear previous text
+  d3.selectAll('#station-data').text('');
+
+  d3.select('#station-name').text(data['NAME']);
+  d3.select('#station-county').text(data['COUNTY']);
+  d3.select('#station-zipcode').text(data['ZIP']);
+}
+// This function creates a datatable
+function createDataTable(data){
+  // Destroy former datatable
+  try {
+    $('#data').DataTable().destroy()
+  }
+  finally {
+    // Format dates
+    for (i=0; i<data.length; i++) {
+      let format_date = formatDateRange(data[i]['DATE_FILTER'])
+      data[i]['DATE_FILTER'] = format_date
+    };
+    // Select and reveal table html
+    d3.select('#data').classed('d-none', false)
+
+    // Initiate datatable
+    $(document).ready(function() {
+      $('#data').DataTable( {
+        data: data,
+        'columns': [
+          {'data': 'DATE_FILTER'},
+          {'data': 'DLY-TMIN-NORMAL'},
+          {'data': 'DLY-TAVG-NORMAL'},
+          {'data': 'DLY-TMAX-NORMAL'}
+        ],
+        searching: false,
+        dom: 'Bfrtip',
+        buttons: [
+          'copy', 'csv', 'excel'
+        ]
+      });
+    });
+  }
+}
+
 // Select the zipcode search button
 var zip_search = d3.select('#zip-search');
 
@@ -124,7 +168,7 @@ $(function() {
     }, function(start, end, label) {
         var zipcode = d3.select('#zipcode').property('value');
         let api_call = '/api/' + zipcode + '/' + start.format('YYYY-MM-DD') + '/' + end.format('YYYY-MM-DD')
-        generatePlot(api_call);
+        showData(api_call);
     });
   });
 
@@ -141,5 +185,7 @@ function showData(api_call) {
     d3.json(api_call).then((data) => {
       // Create the plot
       generatePlot(data);
+      createDataTable(data);
+      addStationData(data[0]);
     })
 }

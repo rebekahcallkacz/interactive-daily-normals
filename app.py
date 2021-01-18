@@ -102,7 +102,13 @@ def searchZipcode(zipcode):
         zip_list.append(doc)
     if len(zip_list) > 0:
         weather_station = zip_list[0]['CLOSEST-STATION']
-        normals_data = mongo.db.normals_test.find({'NAME': weather_station})
+        normals_data = mongo.db.normals_test.find({'NAME': weather_station}, {'DATE_FILTER':1, 
+        'DLY-TAVG-NORMAL':1, 
+        'DLY-TMAX-NORMAL':1, 
+        'DLY-TMIN-NORMAL':1,
+        'NAME':1,
+        'COUNTY':1,
+        'ZIP':1})
         normals_list = []
         for normals in normals_data:
             del normals['_id']
@@ -124,7 +130,16 @@ def searchDate(zipcode, start, end):
     end_filter = dt.datetime.strptime(end_2008, '%Y-%m-%d') + dt.timedelta(days=1)
 
     # Return only date range for given zipcode
-    normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 'DATE_FILTER': {'$gte': start_filter, "$lte": end_filter}})
+    normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 
+    'DATE_FILTER': {'$gte': start_filter, 
+    "$lte": end_filter}}, {'DATE_FILTER':1, 
+    'DLY-TAVG-NORMAL':1, 
+    'DLY-TMAX-NORMAL':1, 
+    'DLY-TMIN-NORMAL':1, 
+    'NAME':1, 
+    'COUNTY':1, 
+    'ZIP':1})
+    
     normals_list = []
     for normals in normals_data:
         del normals['_id']
