@@ -1,5 +1,6 @@
 # API Key Python file
 config.py
+config.js
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

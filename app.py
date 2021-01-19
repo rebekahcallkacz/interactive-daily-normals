@@ -16,6 +16,7 @@ import re
 load_dotenv()
 username = os.getenv("db_username")
 password = os.getenv("db_password")
+API_KEY = os.getenv("API_KEY")
 
 # This function replaces the year in a date with the year 2008
 def formatYear(date_string):
@@ -63,7 +64,7 @@ def methods():
 
 @app.route('/data')
 def data():
-    return render_template('data.html')
+    return render_template('data.html', API_KEY=API_KEY)
 
 @app.route('/about')
 def about():
