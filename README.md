@@ -2,7 +2,8 @@
 This project determines date ranges which are appropriate for laying epoxy.
 
 ## TODO
-* Clean dataset - remove unnecessary columns (STDs), add faux dates, remove references to test_normals in API
+* Fix date issue
 * Update MONGODB w/ cleaned dataset
+* Remove references to test_normals in API
 * Write README
 * Create public access API (?)
