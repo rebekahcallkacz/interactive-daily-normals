@@ -7,7 +7,7 @@ var colors = ["rgb(32,142,183)", "rgb(167,212,121)", "rgb(28,69,133)", "rgb(160,
 
 // This function parses the dates to only return year/month/day
 function formatXticks(str) {
-  var date = new Date(str),
+  let date = new Date(str),
     mnth = ("0" + (date.getMonth() + 1)).slice(-2),
     day = ("0" + date.getDate()).slice(-2);
   return [date.getFullYear(), mnth, day].join("-");
@@ -15,7 +15,7 @@ function formatXticks(str) {
 
 // This function formats the dates for the plot title
 function formatDateRange(str) {
-  var date = new Date(str),
+  let date = new Date(str),
     mnth = ("0" + (date.getMonth() + 1)).slice(-2),
     day = ("0" + date.getDate()).slice(-2);
   return [mnth, day].join("-");
@@ -23,7 +23,7 @@ function formatDateRange(str) {
 
 // This function creates the plot
 function generatePlot(data){
-  console.log(data)
+
         // Set up marker for temps in range
         var min = {
           type: 'scatter',
@@ -59,9 +59,9 @@ function generatePlot(data){
         }; 
   
         // Calculate max and min dates in range
-        let max_date = d3.max(data.map(date => date['DATE_FILTER']))
-        let min_date = d3.min(data.map(date => date['DATE_FILTER']))
-  
+        let max_date = d3.max(data.map(date => Date.parse(date['DATE_FILTER'])))
+        let min_date = d3.min(data.map(date => Date.parse(date['DATE_FILTER'])))
+
         // Set up layout
         var layout = {
           title: `Daily Normals for ${formatDateRange(min_date)} to ${formatDateRange(max_date)}`,
@@ -83,7 +83,6 @@ function generatePlot(data){
               xref: 'paper',
               x0: 0,
               y0: 50,
-              // Set to max of dataset
               x1: 50,
               y1: 100,
               fillcolor: 'rgb(167,212,121)',
@@ -120,10 +119,10 @@ function createDataTable(data){
   }
   finally {
     // Format dates
-    for (i=0; i<data.length; i++) {
-      let format_date = formatDateRange(data[i]['DATE_FILTER'])
-      data[i]['DATE_FILTER'] = format_date
-    };
+    // for (i=0; i<data.length; i++) {
+    //   let format_date = formatDateRange(data[i]['DATE_FILTER'])
+    //   data[i]['DATE'] = format_date
+    // };
     // Select and reveal table html
     d3.select('#data').classed('d-none', false)
 
@@ -132,7 +131,7 @@ function createDataTable(data){
       $('#data').DataTable( {
         data: data,
         'columns': [
-          {'data': 'DATE_FILTER'},
+          {'data': 'DATE'},
           {'data': 'DLY-TMIN-NORMAL'},
           {'data': 'DLY-TAVG-NORMAL'},
           {'data': 'DLY-TMAX-NORMAL'}
@@ -164,7 +163,7 @@ function showDatePicker(){
     date_picker.classed('d-none', false);
 }
 
-// Initiate date range picker
+// Initiate date range picker and create api call when a date range is selected
 $(function() {
     $('input[name="daterange"]').daterangepicker({
         "showDropdowns": true,
@@ -176,7 +175,7 @@ $(function() {
     });
   });
 
-// This function prints the zipcode input
+// This function creates an api call from the zipcode input
   function zipAPI(){
     // Select the zipcode input
     var zipcode = d3.select('#zipcode').property('value');
@@ -187,15 +186,17 @@ $(function() {
 // This function calls in the data and displays it on the webpage
 function showData(api_call) {
     d3.json(api_call).then((data) => {
+      // Hide "no results" notification
       d3.select('#no-results').classed('d-none', true)
-      var length_data = data.length
 
+      // If the API call returns data, plot/show data
+      let length_data = data.length
       if (length_data > 0){
         // Create the plot/table/station card
         generatePlot(data);
         createDataTable(data);
         addStationData(data[0]);
-      } else {
+      } else { // If the API call does not return data, remove current data and notify user
         try {
           // Remove the plot 
           Plotly.purge('normals-plot')

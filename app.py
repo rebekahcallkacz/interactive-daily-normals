@@ -112,6 +112,7 @@ def searchZipcode(zipcode):
     if len(zip_list) > 0:
         weather_station = zip_list[0]['CLOSEST-STATION']
         normals_data = mongo.db.normals.find({'NAME': weather_station}, {'DATE_FILTER':1, 
+        'DATE':1,
         'DLY-TAVG-NORMAL':1, 
         'DLY-TMAX-NORMAL':1, 
         'DLY-TMIN-NORMAL':1,
@@ -151,6 +152,7 @@ def searchDate(zipcode, start, end):
         normals_data = mongo.db.normals.find({'NAME': weather_station, 
         'DATE_FILTER': {'$gte': start_filter, 
         '$lte': end_filter}}, {'DATE_FILTER':1, 
+        'DATE':1,
         'DLY-TAVG-NORMAL':1, 
         'DLY-TMAX-NORMAL':1, 
         'DLY-TMIN-NORMAL':1,
