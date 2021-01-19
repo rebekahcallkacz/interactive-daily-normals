@@ -74,7 +74,7 @@ def about():
 
 @app.route('/api/allnormals')
 def getNormals():
-    normals_data = mongo.db.normals_test.find({})
+    normals_data = mongo.db.normals.find({})
     normals_list = []
     for normals in normals_data:
         del normals['_id']
@@ -111,7 +111,7 @@ def searchZipcode(zipcode):
         zip_list.append(doc)
     if len(zip_list) > 0:
         weather_station = zip_list[0]['CLOSEST-STATION']
-        normals_data = mongo.db.normals_test.find({'NAME': weather_station}, {'DATE_FILTER':1, 
+        normals_data = mongo.db.normals.find({'NAME': weather_station}, {'DATE_FILTER':1, 
         'DLY-TAVG-NORMAL':1, 
         'DLY-TMAX-NORMAL':1, 
         'DLY-TMIN-NORMAL':1,
@@ -148,7 +148,7 @@ def searchDate(zipcode, start, end):
 
         weather_station = zip_list[0]['CLOSEST-STATION']
 
-        normals_data = mongo.db.normals_test.find({'NAME': weather_station, 
+        normals_data = mongo.db.normals.find({'NAME': weather_station, 
         'DATE_FILTER': {'$gte': start_filter, 
         '$lte': end_filter}}, {'DATE_FILTER':1, 
         'DLY-TAVG-NORMAL':1, 

@@ -23,6 +23,7 @@ function formatDateRange(str) {
 
 // This function creates the plot
 function generatePlot(data){
+  console.log(data)
         // Set up marker for temps in range
         var min = {
           type: 'scatter',
