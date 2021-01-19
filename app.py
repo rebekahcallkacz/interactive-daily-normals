@@ -125,7 +125,7 @@ def searchZipcode(zipcode):
         return jsonify(normals_list)
 
     else:
-        return 'none'
+        return jsonify(zip_list)
 
 # Test route for date and zipcode filtering
 # TODO: add zipcode search layer to this route - find nearest weather station and then go from there
@@ -155,7 +155,7 @@ def searchDate(zipcode, start, end):
     if len(normals_list) > 0:
         return jsonify(normals_list)
     else:
-        return 'none'
+        return jsonify(normals_list)
         
 if __name__ == '__main__':
     app.run(debug=True)

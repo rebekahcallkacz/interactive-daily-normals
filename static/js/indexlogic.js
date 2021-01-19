@@ -186,9 +186,33 @@ $(function() {
 // This function calls in the data and displays it on the webpage
 function showData(api_call) {
     d3.json(api_call).then((data) => {
-      // Create the plot
-      generatePlot(data);
-      createDataTable(data);
-      addStationData(data[0]);
+      d3.select('#no-results').classed('d-none', true)
+      var length_data = data.length
+
+      if (length_data > 0){
+        // Create the plot/table/station card
+        generatePlot(data);
+        createDataTable(data);
+        addStationData(data[0]);
+      } else {
+        try {
+          // Remove the plot 
+          Plotly.purge('normals-plot')
+
+          // Destroy the datatable
+          $('#data').DataTable().destroy()
+          d3.select('#data').classed('d-none', true)
+
+          // Remove any station metadata
+          d3.select('#station-info-card').classed('d-none', true);
+
+          d3.select('#station-name').text('');
+          d3.select('#station-county').text('');
+          d3.select('#station-zipcode').text('');
+        }
+        finally {
+          d3.select('#no-results').classed('d-none', false)
+        }
+      }
     })
 }
