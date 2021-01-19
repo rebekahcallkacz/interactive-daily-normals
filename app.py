@@ -84,7 +84,7 @@ def getNormals():
 
 @app.route('/api/allstations')
 def getStations():
-    station_data = mongo.db.stations.find({})
+    station_data = mongo.db.stations.find({}, {'LATITUDE':1, 'LONGITUDE':1, 'NAME':1, 'COUNTY':1, 'ZIP':1})
     station_list = []
     for station in station_data:
         del station['_id']
