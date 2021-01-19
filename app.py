@@ -132,31 +132,42 @@ def searchZipcode(zipcode):
 # TODO: add zipcode search layer to this route - find nearest weather station and then go from there
 @app.route('/api/<zipcode>/<start>/<end>')
 def searchDate(zipcode, start, end):
-    zipcode = zipcode
-    start_2008 = formatYear(start)
-    end_2008 = formatYear(end)
-    start_filter = dt.datetime.strptime(start_2008, '%Y-%m-%d')
-    end_filter = dt.datetime.strptime(end_2008, '%Y-%m-%d') + dt.timedelta(days=1)
+    zip_data = mongo.db.zipcodes.find({'ZIP':zipcode})
+    zip_list = []
+    for doc in zip_data:
+        del doc['_id']
+        zip_list.append(doc)
 
-    # Return only date range for given zipcode
-    normals_data = mongo.db.normals_test.find({'ZIP': zipcode, 
-    'DATE_FILTER': {'$gte': start_filter, 
-    "$lte": end_filter}}, {'DATE_FILTER':1, 
-    'DLY-TAVG-NORMAL':1, 
-    'DLY-TMAX-NORMAL':1, 
-    'DLY-TMIN-NORMAL':1, 
-    'NAME':1, 
-    'COUNTY':1, 
-    'ZIP':1})
-    
-    normals_list = []
-    for normals in normals_data:
-        del normals['_id']
-        normals_list.append(normals)
-    if len(normals_list) > 0:
+    # If the zipcode is in the database, return the normals for the nearest weather station
+    if len(zip_list) > 0:
+        # Format dates for filtering
+        start_2008 = formatYear(start)
+        end_2008 = formatYear(end)
+        start_filter = dt.datetime.strptime(start_2008, '%Y-%m-%d')
+        end_filter = dt.datetime.strptime(end_2008, '%Y-%m-%d') + dt.timedelta(days=1)
+
+        weather_station = zip_list[0]['CLOSEST-STATION']
+
+        normals_data = mongo.db.normals_test.find({'NAME': weather_station, 
+        'DATE_FILTER': {'$gte': start_filter, 
+        '$lte': end_filter}}, {'DATE_FILTER':1, 
+        'DLY-TAVG-NORMAL':1, 
+        'DLY-TMAX-NORMAL':1, 
+        'DLY-TMIN-NORMAL':1,
+        'NAME':1,
+        'COUNTY':1,
+        'ZIP':1})
+
+        normals_list = []
+        for normals in normals_data:
+            del normals['_id']
+            normals_list.append(normals)
+
         return jsonify(normals_list)
+
+    # If the zipcode is not in the database, return an empty list
     else:
-        return jsonify(normals_list)
+        return jsonify(zip_list)
         
 if __name__ == '__main__':
     app.run(debug=True)
