@@ -141,24 +141,69 @@ def searchDate(zipcode, start, end):
 
     # If the zipcode is in the database, return the normals for the nearest weather station
     if len(zip_list) > 0:
-        # Format dates for filtering
-        start_2008 = formatYear(start)
-        end_2008 = formatYear(end)
-        start_filter = dt.datetime.strptime(start_2008, '%Y-%m-%d')
-        end_filter = dt.datetime.strptime(end_2008, '%Y-%m-%d') + dt.timedelta(days=1)
+        # Determine if dates are in same year
+        start_year = dt.datetime.strptime(start, '%Y-%m-%d').year
+        end_year = dt.datetime.strptime(end, '%Y-%m-%d').year
+        # If the search is within one year, create a filter between those two dates but w/ the year 2008
+        if start_year == end_year:
+            # Format years to match those in database (2008)
+            start_2008 = formatYear(start)
+            end_2008 = formatYear(end)
+            start_filter = dt.datetime.strptime(start_2008, '%Y-%m-%d')
+            end_filter = dt.datetime.strptime(end_2008, '%Y-%m-%d') + dt.timedelta(days=1)
 
-        weather_station = zip_list[0]['CLOSEST-STATION']
+            # Select this range in mongodb
+            weather_station = zip_list[0]['CLOSEST-STATION']
 
-        normals_data = mongo.db.normals.find({'NAME': weather_station, 
-        'DATE_FILTER': {'$gte': start_filter, 
-        '$lte': end_filter}}, {'DATE_FILTER':1, 
-        'DATE':1,
-        'DLY-TAVG-NORMAL':1, 
-        'DLY-TMAX-NORMAL':1, 
-        'DLY-TMIN-NORMAL':1,
-        'NAME':1,
-        'COUNTY':1,
-        'ZIP':1})
+            normals_data = mongo.db.normals.find({'NAME': weather_station, 
+            'DATE_FILTER': {'$gte': start_filter, '$lte': end_filter}}, {'DATE_FILTER':1, 
+            'DATE':1,
+            'DLY-TAVG-NORMAL':1, 
+            'DLY-TMAX-NORMAL':1, 
+            'DLY-TMIN-NORMAL':1,
+            'NAME':1,
+            'COUNTY':1,
+            'ZIP':1})
+        # If the search spans more than one year, filter accordingly
+        else:
+            # If there is only year difference between the two dates, return start - end of 2008 AND beginning of 2008 - end
+            if (end_year - start_year) == 1:
+                start_1 = formatYear(start)
+                start_2 = '2008-01-01'
+                end_1 = '2008-12-31'
+                end_2 = formatYear(end)
+                start_filter_1 = dt.datetime.strptime(start_1, '%Y-%m-%d')
+                end_filter_1 = dt.datetime.strptime(end_1, '%Y-%m-%d') + dt.timedelta(days=1)
+                start_filter_2 = dt.datetime.strptime(start_2, '%Y-%m-%d')
+                end_filter_2 = dt.datetime.strptime(end_2, '%Y-%m-%d') + dt.timedelta(days=1)
+
+                # Search this range in MONGODB
+                weather_station = zip_list[0]['CLOSEST-STATION']
+
+                normals_data = mongo.db.normals.find({'$or': 
+                [{'NAME': weather_station, 'DATE_FILTER': {'$gte': start_filter_1, '$lte': end_filter_1}}, 
+                {'NAME': weather_station, 'DATE_FILTER': {'$gte': start_filter_2, '$lte': end_filter_2}}]}, 
+                {'DATE_FILTER':1, 
+                'DATE':1,
+                'DLY-TAVG-NORMAL':1, 
+                'DLY-TMAX-NORMAL':1, 
+                'DLY-TMIN-NORMAL':1,
+                'NAME':1,
+                'COUNTY':1,
+                'ZIP':1})
+
+            # If there is more than a one year difference, return the entire year of 2008
+            else:
+                weather_station = zip_list[0]['CLOSEST-STATION']
+
+                normals_data = mongo.db.normals.find({'NAME': weather_station}, {'DATE_FILTER':1, 
+                'DATE':1,
+                'DLY-TAVG-NORMAL':1, 
+                'DLY-TMAX-NORMAL':1, 
+                'DLY-TMIN-NORMAL':1,
+                'NAME':1,
+                'COUNTY':1,
+                'ZIP':1})           
 
         normals_list = []
         for normals in normals_data:
