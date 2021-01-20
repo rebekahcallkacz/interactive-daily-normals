@@ -45,25 +45,23 @@ The date range picker was generated using the Javascript library Date Range Pick
 ## Results: [View the Website](https://dailynormals.herokuapp.com/)
 When the user enters their search parameters, the webpage displays a line graph of the daily normals, metadata about the weather station and a downloadable datatable with the dates and normals. 
 
-![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/architecture.jpg "Resuts Page pt. 1")
+![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/results1.jpg "Resuts Page pt. 1")
 
-![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/architecture.jpg "Results Page pt. 2")
+![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/results2.jpg "Results Page pt. 2")
 
 The user can also view an interactive map of all weather stations in the dataset. The user can click on each weather station to view further information about that station.
 
-![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/architecture.jpg "Map pt. 1")
+![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/map1.jpg "Map pt. 1")
 
-![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/architecture.jpg "Map pt. 2")
+![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/map2.jpg "Map pt. 2")
 
 ## Limitations
-
+Predicting weather is particularly difficult even only a few days beforehand, so, although this analysis provides general guidelines as to what the weather might be like, it is not guaranteed to be accurate. In the future, I would like to add more states to the database and create a publicly available API.
 
 ## References 
 Anthony Arguez, Imke Durre, Scott Applequist, Mike Squires, Russell Vose, Xungang Yin, and Rocky Bilotta (2010). NOAA's U.S. Climate Normals (1981-2010). [AL, GA, KY, NC, SC, TN, WV, and VA]. NOAA National Centers for Environmental Information. DOI:10.7289/V5PN93JP[12-7-2020].
 
 Coven, D. S., (2012). Free Zipcode Database: All Locations [data file]. Retrieved from http://federalgovernmentzipcodes.us
-
-
 
 ## Contributors
 Rebekah Callari-Kaczmarczyk
@@ -71,5 +69,3 @@ Rebekah Callari-Kaczmarczyk
 ## License and Copyright
 &copy; Rebekah Callari-Kaczmarczyk
 
-## TODO
-* Create public access API (?)
