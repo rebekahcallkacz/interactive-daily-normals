@@ -130,7 +130,11 @@ def searchZipcode(zipcode):
         return jsonify(zip_list)
 
 # Test route for date and zipcode filtering
-# TODO: add zipcode search layer to this route - find nearest weather station and then go from there
+# The dataset includes an average of normals from 1981-2010. For this reason, an arbitrary year (2008) was assigned
+# to the dataset to allow for MongoDB date filtering. When the user enters a date range that spans multiple years, 
+# e.g. 12/31/2020 - 1/20/2021, this creates an issue with filtering in MongoDB and also creates issues with presenting
+# the data to the user on the front end. For this reason, the type of date range requested is tested and if this type of 
+# range is required, this difference in years is also noted.
 @app.route('/api/<zipcode>/<start>/<end>')
 def searchDate(zipcode, start, end):
     zip_data = mongo.db.zipcodes.find({'ZIP':zipcode})
@@ -164,7 +168,7 @@ def searchDate(zipcode, start, end):
             'NAME':1,
             'COUNTY':1,
             'ZIP':1})
-        # If the search spans more than one year, filter accordingly
+        # If the search spans more than one year, filter accordingly 
         else:
             # If there is only year difference between the two dates, return start - end of 2008 AND beginning of 2008 - end
             if (end_year - start_year) == 1:
@@ -207,7 +211,6 @@ def searchDate(zipcode, start, end):
 
         normals_list = []
         for normals in normals_data:
-            del normals['_id']
             normals_list.append(normals)
 
         return jsonify(normals_list)
