@@ -7,7 +7,7 @@ Version 1.0.0
 This project displays daily normals (max, min, and average) for a given date range and zip code in the Southeast United States in order to assist in determining the best time to schedule concrete restoration contracts.
 
 ## Background
-Concrete restoration projects which use epoxy require that the temperature be between 50 and 100 degrees in order for the epoxy to properly adhere. For companies that complete these projects, it is essential that they know when temperatures will most likely be within this range. For this project, I collected data on daily temperatures in the Southeast United States and displayed it on a searchable website to aid in planning these contract jobs.
+My client works for a concrete restoration company and is responsible for scheduling job contracts in the Southeast US. Concrete restoration projects which use epoxy require that the temperature be between 50 and 100 degrees in order for the epoxy to properly adhere. For my client, it is essential that they know when temperatures will most likely be within this range. For this project, I collected data on daily temperatures in the Southeast United States and displayed it on a searchable website to aid in planning these contract jobs.
 
 ## Data
 NCEI's data was chosen due to its availability and how extensive it is: 30 years of normals normed by measurement (Arguez et al., 2010). This should provide a fairly accurate evaluation of what the average temperature is for any calendar date. The 8 states (AL, GA, KY, NC, SC, TN, WV, and VA) my client works in most regularly were selected for this analysis.
@@ -29,6 +29,11 @@ These three datasets (normals, stations and zipcodes) were uploaded to two Mongo
 
 ## Methods
 Heroku was used to deploy a full stack application allowing the user to search for daily normals by zipcode and calendar date. In order to avoid being throttled in MongoDB's free tier, the website was designed so that the user must search each zipcode individually and cannot request the entire dataset at once.
+
+### Calendar Days vs. Dates
+In the normals dataset, the field "DATE" is in the format "MM-DD" since this is a dataset of averages calculated across multiple years. This poses challenges when attempting to filter the data. In order to store the date in MONGODB using the Date datatype, a new field called "DATE_FILTER" which contains "MM-DD-2008". The year 2008 was chosen because it is a leap year within 1981-2010 (the timeframe in which the dataset was collected). 
+
+The date range picker on the front end is a standard JavaScript library. Date range pickers assume that the entire date is of interest, and they allow the user to pick a date with a year attached. For ease of use, this functionality was not disabled. Instead, the API route was built to accommodate any year(s). The user enters their dates which are appended to the API call. These dates are then converted to the year 2008 and the appropriate calendar days are returned. The data displayed to the user does not include years since the dataset does not actually contain years. 
 
 ### App Architecture
 ![alt text](https://github.com/rebekahcallkacz/interactive-daily-normals/blob/main/static/images/architecture.jpg "App Architecture")
