@@ -1,5 +1,3 @@
-# TODO: Connect to full normals collection instead of test collection
-
 # Dependencies
 from flask import Flask, render_template, jsonify
 from flask_pymongo import PyMongo
@@ -17,6 +15,13 @@ load_dotenv()
 username = os.getenv("db_username")
 password = os.getenv("db_password")
 API_KEY = os.getenv("API_KEY")
+
+# This function unpacks MONGODB data
+def returnNormals(data):
+    normals_list = []
+    for normals in data:
+        normals_list.append(normals)
+    return(normals_list)
 
 # This function replaces the year in a date with the year 2008
 def formatYear(date_string):
@@ -40,15 +45,16 @@ mongo = PyMongo(app)
 # Format of db in MONGODB:
 # Database: weather
 # Collection: normals
+# In this dataset, 'DATE' is an aggregate (the average of 1981-2010) and is in the format 'MM-DD' for all 366 calendar days. 
+# Because date functionality in MongoDB requires a year, a 'DATE_FILTER' field was added which contains 'MM-DD-2008'
 # Keys: ['STATION', 'NAME', 'LATITUDE', 'LONGITUDE', 'ELEVATION', 'DATE', 'DLY-TAVG-NORMAL', 'DLY-TAVG-STDDEV', 'DLY-TMAX-NORMAL', 
-# 'DLY-TMAX-STDDEV', 'DLY-TMIN-NORMAL', 'DLY-TMIN-STDDEV', 'STATE', 'COUNTY', 'ZIP']
+# 'DLY-TMAX-STDDEV', 'DLY-TMIN-NORMAL', 'DLY-TMIN-STDDEV', 'STATE', 'COUNTY', 'ZIP', 'DATE_FILTER']
 # Collection: stations
 # Keys: ['STATION', 'NAME', 'LATITUDE', 'LONGITUDE', 'STATE', 'COORD', 'COUNTY', 'ZIP']
 # Collection: zipcodes
 # Keys: ['ZIP', 'STATE', 'LATITUDE', 'LONGITUDE', 'CLOSEST-STATION']
 # Collection: normals_test
-# Keys: same as normals except added filed DATE_FILTER which contains dates in MONGODB format w/ year 2008
-# NOTE: dataset only contains zipcodes 27253 (1 weather station) and 27215 (2 weather stations)
+# Keys: same as normals except only contains zipcodes 27253 (1 weather station) and 27215 (2 weather stations)
 
 @app.route('/')
 def home():
@@ -70,8 +76,10 @@ def data():
 def about():
     return render_template('about.html')
 
-# Will need to add templates for rendering additional webpages 
 
+# These routes return data
+
+# This route returns all normals for all stations in the dataset
 @app.route('/api/allnormals')
 def getNormals():
     normals_data = mongo.db.normals.find({})
@@ -82,6 +90,7 @@ def getNormals():
 
     return jsonify(normals_list)
 
+# This route returns metadata for all stations in the dataset
 @app.route('/api/allstations')
 def getStations():
     station_data = mongo.db.stations.find({}, {'LATITUDE':1, 'LONGITUDE':1, 'NAME':1, 'COUNTY':1, 'ZIP':1})
@@ -92,6 +101,7 @@ def getStations():
 
     return jsonify(station_list)
 
+# This route returns all zipcodes in the SE US and their closest weather station
 @app.route('/api/allzipcodes')
 def getZipcodes():
     zip_data = mongo.db.zipcodes.find({})
@@ -102,6 +112,7 @@ def getZipcodes():
 
     return jsonify(zip_list)
 
+# This route returns all normals for a specific zipcode
 @app.route('/api/<zipcode>')
 def searchZipcode(zipcode):
     zip_data = mongo.db.zipcodes.find({'ZIP':zipcode})
@@ -129,7 +140,8 @@ def searchZipcode(zipcode):
     else:
         return jsonify(zip_list)
 
-# Test route for date and zipcode filtering
+# This route returns normals for a given zipcode and date range 
+# Dates should be in the form: 'YYYY-MM-DD'
 # The dataset includes an average of normals from 1981-2010. For this reason, an arbitrary year (2008) was assigned
 # to the dataset to allow for MongoDB date filtering. When the user enters a date range that spans multiple years, 
 # e.g. 12/31/2020 - 1/20/2021, this creates an issue with filtering in MongoDB and also creates issues with presenting
@@ -160,7 +172,7 @@ def searchDate(zipcode, start, end):
             weather_station = zip_list[0]['CLOSEST-STATION']
 
             normals_data = mongo.db.normals.find({'NAME': weather_station, 
-            'DATE_FILTER': {'$gte': start_filter, '$lte': end_filter}}, {'DATE_FILTER':1, 
+            'DATE_FILTER': {'$gte': start_filter, '$lte': end_filter}}, {'_id':0, 'DATE_FILTER':1, 
             'DATE':1,
             'DLY-TAVG-NORMAL':1, 
             'DLY-TMAX-NORMAL':1, 
@@ -168,10 +180,17 @@ def searchDate(zipcode, start, end):
             'NAME':1,
             'COUNTY':1,
             'ZIP':1})
-        # If the search spans more than one year, filter accordingly 
+
+            # Unpack MONGODB object
+            normals_list = returnNormals(normals_data)
+
+        # Determine if the search spans more than one year 
         else:
             # If there is only year difference between the two dates, return start - end of 2008 AND beginning of 2008 - end
+            # In order to ensure that front end display is in the order the user expects based on their input
+            # (e.g. Dec 31, 2020 - Jan 1 ,2021), the 'DATE_FILTER' is manipulated to record the difference in years
             if (end_year - start_year) == 1:
+                # Format dates for filtering in MONGODB
                 start_1 = formatYear(start)
                 start_2 = '2008-01-01'
                 end_1 = '2008-12-31'
@@ -181,13 +200,15 @@ def searchDate(zipcode, start, end):
                 start_filter_2 = dt.datetime.strptime(start_2, '%Y-%m-%d')
                 end_filter_2 = dt.datetime.strptime(end_2, '%Y-%m-%d') + dt.timedelta(days=1)
 
-                # Search this range in MONGODB
+                # Determine weather station nearest to the zipcode
                 weather_station = zip_list[0]['CLOSEST-STATION']
 
+                # Search for this zipcode and these date ranges in MONGODB
                 normals_data = mongo.db.normals.find({'$or': 
                 [{'NAME': weather_station, 'DATE_FILTER': {'$gte': start_filter_1, '$lte': end_filter_1}}, 
                 {'NAME': weather_station, 'DATE_FILTER': {'$gte': start_filter_2, '$lte': end_filter_2}}]}, 
-                {'DATE_FILTER':1, 
+                {'_id':0, 
+                'DATE_FILTER':1, 
                 'DATE':1,
                 'DLY-TAVG-NORMAL':1, 
                 'DLY-TMAX-NORMAL':1, 
@@ -196,11 +217,27 @@ def searchDate(zipcode, start, end):
                 'COUNTY':1,
                 'ZIP':1})
 
+                # Unpack MONGODB object
+                normals_list = []
+                normals_list = returnNormals(normals_data)
+
+                # If the full dataset was not returned, replace 2008 with the search years
+                if len(normals_list) != 366:
+                    for normals in normals_list:
+                        date_filter = normals['DATE_FILTER']
+                        # If date is in first range, add first year
+                        if date_filter > end_filter_2:
+                            normals['DATE_FILTER'] = date_filter.replace(year=start_year)
+                        # If date is in second range, add second year
+                        else:
+                            normals['DATE_FILTER'] = date_filter.replace(year=end_year)
+
             # If there is more than a one year difference, return the entire year of 2008
             else:
                 weather_station = zip_list[0]['CLOSEST-STATION']
 
-                normals_data = mongo.db.normals.find({'NAME': weather_station}, {'DATE_FILTER':1, 
+                normals_data = mongo.db.normals.find({'NAME': weather_station}, {'_id':0,
+                'DATE_FILTER':1, 
                 'DATE':1,
                 'DLY-TAVG-NORMAL':1, 
                 'DLY-TMAX-NORMAL':1, 
@@ -209,9 +246,8 @@ def searchDate(zipcode, start, end):
                 'COUNTY':1,
                 'ZIP':1})           
 
-        normals_list = []
-        for normals in normals_data:
-            normals_list.append(normals)
+                # Unpack MONGODB object
+                normals_list = returnNormals(normals_data)
 
         return jsonify(normals_list)
 
